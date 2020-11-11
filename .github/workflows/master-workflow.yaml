@@ -1,4 +1,4 @@
-name: feature
+name: master
 
 on:
   push:
@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Setup Java and Scala
         uses: olafurpg/setup-scala@v10
@@ -45,3 +47,34 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: target
+
+    deploy:
+      needs: build
+      name: Deploy to Dev
+      runs-on: ubuntu-latest
+
+      steps:
+        - name: Check out repository code
+          uses: actions/checkout@v2
+
+        - name: Setup Java and Scala
+          uses: olafurpg/setup-scala@v10
+
+        - name: Cache sbt
+          uses: actions/cache@v2
+          with:
+            path: |
+              ~/.sbt
+              ~/.ivy2/cache
+            key: ${{ runner.os }}-sbt-cache-v2-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('project/build.properties') }}
+
+        - name: Package
+          shell: bash
+          run: make package
+
+        - name: Deploy to Dev
+          shell: bash
+          run: make deploy-to-dev
+
+
+

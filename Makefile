@@ -7,3 +7,11 @@ lint:
 
 test:
 	@sbt -DcacheToDisk=1 coverage test coverageReport coverageAggregate
+
+package:
+	@sbt assembly
+	@echo "output/assembly.jar"
+
+deploy-to-dev:
+	@echo "DEV DEPLOY"
+	@sbt --error 'set showSuccess := false' showVersion
