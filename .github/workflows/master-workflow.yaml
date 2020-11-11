@@ -42,6 +42,11 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: target
 
+      - name: Set variables
+        id: vars
+        run: echo ::set-output name=version::$(make version)
+
+
     deploy:
       needs: build
       name: Deploy to Dev
@@ -69,6 +74,18 @@ jobs:
         - name: Deploy to Dev
           shell: bash
           run: make deploy-to-dev
+
+    release:
+      needs: build
+      name: Release issue
+      runs-on: ubuntu-latest
+
+        - uses: JasonEtco/create-an-issue@v2
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            VERSION: ${{ jobs.build.steps.vars.outputs.version }}" }}
+          with:
+            filename: .github/ISSUE_TEMPLATE/release-approval.md
 
 
 

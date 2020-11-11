@@ -12,6 +12,10 @@ package:
 	@sbt assembly
 	@echo "output/assembly.jar"
 
-deploy-to-dev:
-	@echo "DEV DEPLOY"
+version:
 	@sbt --error 'set showSuccess := false' showVersion
+
+deploy-to-dev-dummy:
+	@echo "DEV DEPLOY"
+
+deploy-to-dev: deploy-to-dev-dummy version
