@@ -40,11 +40,11 @@ jobs:
 
       - name: Lint
         shell: bash
-        run: sbt scalastyle
+        run: make lint
 
       - name: Test
         shell: bash
-        run: sbt -DcacheToDisk=1 coverage test coverageReport coverageAggregate
+        run: make test
 
       - name: Codecov
         uses: codecov/codecov-action@v1
