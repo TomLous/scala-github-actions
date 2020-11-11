@@ -1,5 +1,5 @@
 ---
-title:  [DATE]: 🚀 Deployment {{ env.VERSION }} ready for release
+title: [DATE] 🚀 Deployment {{ env.VERSION }} ready for release
 assignees: TomLous
 labels: awaiting-review, dev-release
 ---
