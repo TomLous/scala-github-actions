@@ -1,0 +1,91 @@
+name: master
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'master'
+
+jobs:
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java and Scala
+        uses: olafurpg/setup-scala@v10
+
+      - name: Cache sbt
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.sbt
+            ~/.ivy2/cache
+          key: ${{ runner.os }}-sbt-cache-v2-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('project/build.properties') }}
+
+      - name: Lint
+        shell: bash
+        run: make lint
+
+      - name: Test
+        shell: bash
+        run: make test
+
+      - name: Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: target
+
+      - name: Set variables
+        id: vars
+        run: echo ::set-output name=version::$(make version)
+
+
+    deploy:
+      needs: build
+      name: Deploy to Dev
+      runs-on: ubuntu-latest
+
+      steps:
+        - name: Check out repository code
+          uses: actions/checkout@v2
+
+        - name: Setup Java and Scala
+          uses: olafurpg/setup-scala@v10
+
+        - name: Cache sbt
+          uses: actions/cache@v2
+          with:
+            path: |
+              ~/.sbt
+              ~/.ivy2/cache
+            key: ${{ runner.os }}-sbt-cache-v2-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('project/build.properties') }}
+
+        - name: Package
+          shell: bash
+          run: make package
+
+        - name: Deploy to Dev
+          shell: bash
+          run: make deploy-to-dev
+
+    release:
+      needs: build
+      name: Release issue
+      runs-on: ubuntu-latest
+
+        - uses: JasonEtco/create-an-issue@v2
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            VERSION: ${{ jobs.build.steps.vars.outputs.version }}" }}
+          with:
+            filename: .github/ISSUE_TEMPLATE/release-approval.md
+
+
+

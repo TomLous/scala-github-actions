@@ -12,12 +12,14 @@ Test / testOptions += Tests.Argument("-oDT")
 Test / parallelExecution := false
 
 assembly / assemblyOption := (assemblyOption in assembly).value.copy(includeScala = false)
-assembly / assemblyOutputPath := baseDirectory.value / "output" / name.value
+assembly / assemblyOutputPath := baseDirectory.value / "output" / "assembly.jar"
 assembly / logLevel := sbt.util.Level.Error
 assembly / test := {}
 pomIncludeRepository := { _ =>
   false
 }
+
+dynverSeparator in ThisBuild := "-"
 
 scalacOptions ++= Seq(
   "-deprecation",
@@ -31,3 +33,8 @@ scalacOptions ++= Seq(
   "-encoding",
   "UTF-8"
 )
+
+lazy val showVersion = taskKey[Unit]("Show version")
+showVersion := {
+  println((version in ThisBuild).value)
+}
