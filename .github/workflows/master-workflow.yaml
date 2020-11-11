@@ -16,8 +16,6 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
 
       - name: Setup Java and Scala
         uses: olafurpg/setup-scala@v10
@@ -83,6 +81,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+
       - name: Create ticket
         uses: JasonEtco/create-an-issue@v2
         env:
