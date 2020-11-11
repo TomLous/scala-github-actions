@@ -6,11 +6,6 @@ on:
       - 'feature/**'
       - 'feat/**'
       - 'hotfix'
-  pull_request:
-    types: [ opened, reopened ]
-    branches:
-      - 'master'
-      - 'main'
 
 jobs:
   build:
