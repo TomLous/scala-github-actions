@@ -80,7 +80,9 @@ jobs:
       name: Release issue
       runs-on: ubuntu-latest
 
-        - uses: JasonEtco/create-an-issue@v2
+      steps:
+        - name: Create ticket
+          uses: JasonEtco/create-an-issue@v2
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             VERSION: ${{ jobs.build.steps.vars.outputs.version }}" }}
