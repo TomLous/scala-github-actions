@@ -1,9 +1,12 @@
-name: master
+name: main
 
 on:
   push:
     branches:
-      - 'main'
+      - 'feature/**'
+      - 'feat/**'
+      - 'hotfix'
+      - 'hotfix/**'
       - 'master'
 
 jobs:
@@ -16,6 +19,8 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Setup Java and Scala
         uses: olafurpg/setup-scala@v10
@@ -48,6 +53,7 @@ jobs:
 
 
   deploy:
+    if: github.ref == 'refs/heads/master'
     needs: build
     name: Deploy to Dev
     runs-on: ubuntu-latest
@@ -55,6 +61,8 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Setup Java and Scala
         uses: olafurpg/setup-scala@v10
@@ -74,23 +82,5 @@ jobs:
       - name: Deploy to Dev
         shell: bash
         run: make deploy-to-dev
-
-  release:
-    needs: build
-    name: Release issue
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Check out repository code
-        uses: actions/checkout@v2
-
-      - name: Create ticket
-        uses: JasonEtco/create-an-issue@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ needs.build.outputs.version }}" }}
-        with:
-          filename: .github/ISSUE_TEMPLATE/release-approval.md
-
 
 
