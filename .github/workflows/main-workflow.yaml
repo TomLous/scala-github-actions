@@ -96,7 +96,7 @@ jobs:
               icon_emoji: ':github:',
               attachments: [ {
                 color: '${{job.status}}' === 'success' ? 'good': '${{job.status}}' === 'failure' ? 'danger': 'warning',
-                text: `${jobs.build.steps.vars.outputs.version} deployed to dev`,
+                text: `${{needs.build.outputs.version}} deployed to dev`,
               } ]
             }
 
@@ -104,8 +104,10 @@ jobs:
       - name: Slack Status
         uses: 8398a7/action-slack@v3
         with:
+          author_name: ''
+          icon_emoji: ':github:'
           status: ${{ job.status }}
-          fields: repo,message,action,took
+          fields: repo,message,commit,took,action
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
         if: ${{ always() }}
