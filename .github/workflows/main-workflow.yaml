@@ -83,4 +83,32 @@ jobs:
         shell: bash
         run: make deploy-to-dev
 
+      - name: Slack Message
+        uses: 8398a7/action-slack@v3
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        with:
+          status: custom
+          fields: workflow,job,commit,repo,ref,author,took
+          custom_payload: |
+            {
+              username: 'action-slack',
+              icon_emoji: ':github:',
+              attachments: [ {
+                color: '${{job.status}}' === 'success' ? 'good': '${{job.status}}' === 'failure' ? 'danger': 'warning',
+                text: `${jobs.build.steps.vars.outputs.version} deployed to dev`,
+              } ]
+            }
+
+
+      - name: Slack Status
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,action,took
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+        if: ${{ always() }}
+
+
 
