@@ -40,9 +40,7 @@ val relProcessForBump = Seq[ReleaseStep](
   inquireVersions,
   setReleaseVersion,
   commitReleaseVersion,
-  tagRelease,
-  setNextVersion,
-  commitNextVersion
+  tagRelease
 )
 
 commands += Command.command("bumpPatch") { state =>
