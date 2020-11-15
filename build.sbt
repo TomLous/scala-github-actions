@@ -78,3 +78,8 @@ commands += Command.command("bumpMajor") { state =>
   )
   Command.process("release with-defaults", customState)
 }
+
+lazy val showVersion = taskKey[Unit]("Show version")
+showVersion := {
+  println((version in ThisBuild).value)
+}
