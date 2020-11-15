@@ -38,12 +38,14 @@ scalacOptions ++= Seq(
 
 val relProcessForBump = Seq[ReleaseStep](
   inquireVersions,
+  setReleaseVersion,
+  commitReleaseVersion,
+  tagRelease,
   setNextVersion,
-  commitReleaseVersion
+  commitNextVersion
 )
 
 commands += Command.command("bumpPatch") { state =>
-  println("Bumping patch version!")
   val extracted = Project extract state
   val customState = extracted.appendWithoutSession(
     Seq(
@@ -56,7 +58,6 @@ commands += Command.command("bumpPatch") { state =>
 }
 
 commands += Command.command("bumpMinor") { state =>
-  println("Bumping minor version!")
   val extracted = Project extract state
   val customState = extracted.appendWithoutSession(
     Seq(
@@ -69,7 +70,6 @@ commands += Command.command("bumpMinor") { state =>
 }
 
 commands += Command.command("bumpMajor") { state =>
-  println("Bumping major version!")
   val extracted = Project extract state
   val customState = extracted.appendWithoutSession(
     Seq(
