@@ -1,3 +1,5 @@
+import ReleaseTransformations._
+
 name := "scala-github-actions"
 
 scalaVersion := "2.12.10"
@@ -19,7 +21,7 @@ pomIncludeRepository := { _ =>
   false
 }
 
-dynverSeparator in ThisBuild := "-"
+//dynverSeparator in ThisBuild := "-"
 
 scalacOptions ++= Seq(
   "-deprecation",
@@ -34,7 +36,47 @@ scalacOptions ++= Seq(
   "UTF-8"
 )
 
-lazy val showVersion = taskKey[Unit]("Show version")
-showVersion := {
-  println((version in ThisBuild).value)
+val relProcessForBump = Seq[ReleaseStep](
+  inquireVersions,
+  setNextVersion,
+  commitReleaseVersion
+)
+
+commands += Command.command("bumpPatch") { state =>
+  println("Bumping patch version!")
+  val extracted = Project extract state
+  val customState = extracted.appendWithoutSession(
+    Seq(
+      releaseProcess := relProcessForBump,
+      releaseVersionBump := sbtrelease.Version.Bump.Bugfix
+    ),
+    state
+  )
+  Command.process("release with-defaults", customState)
+}
+
+commands += Command.command("bumpMinor") { state =>
+  println("Bumping minor version!")
+  val extracted = Project extract state
+  val customState = extracted.appendWithoutSession(
+    Seq(
+      releaseProcess := relProcessForBump,
+      releaseVersionBump := sbtrelease.Version.Bump.Minor
+    ),
+    state
+  )
+  Command.process("release with-defaults", customState)
+}
+
+commands += Command.command("bumpMajor") { state =>
+  println("Bumping major version!")
+  val extracted = Project extract state
+  val customState = extracted.appendWithoutSession(
+    Seq(
+      releaseProcess := relProcessForBump,
+      releaseVersionBump := sbtrelease.Version.Bump.Major
+    ),
+    state
+  )
+  Command.process("release with-defaults", customState)
 }

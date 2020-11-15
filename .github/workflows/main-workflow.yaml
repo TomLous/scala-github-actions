@@ -51,6 +51,18 @@ jobs:
         id: vars
         run: echo ::set-output name=version::$(make version)
 
+      - name: Slack Status on Error
+        uses: 8398a7/action-slack@v3
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        with:
+          username: 'github actions'
+          author_name: ''
+          icon_emoji: ':github:'
+          status: ${{ job.status }}
+          fields: repo,message,commit,action
+        if: ${{ failure() }}
+
 
   deploy:
     if: github.ref == 'refs/heads/master'
@@ -83,7 +95,7 @@ jobs:
         shell: bash
         run: make deploy-to-dev
 
-      - name: Slack Message
+      - name: Deploy notification
         uses: 8398a7/action-slack@v3
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -93,10 +105,9 @@ jobs:
           icon_emoji: ':github:'
           status: ${{ job.status }}
           fields:
-          text: '${{job.repo}} | ${{needs.build.outputs.version}} deployed to dev'
+          text: ':rocket: v${{needs.build.outputs.version}} deployed to DEV'
 
-
-      - name: Slack Status
+      - name: Slack Status on Error
         uses: 8398a7/action-slack@v3
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -106,7 +117,7 @@ jobs:
           icon_emoji: ':github:'
           status: ${{ job.status }}
           fields: repo,message,commit,action
-        if: ${{ always() }}
+        if: ${{ failure() }}
 
 
 

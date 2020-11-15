@@ -1,5 +1,8 @@
 // Dynamic versioning: https://github.com/dwijnand/sbt-dynver
-addSbtPlugin("com.dwijnand" % "sbt-dynver" % "4.1.1")
+//addSbtPlugin("com.dwijnand" % "sbt-dynver" % "4.1.1")
+
+// Automated release process https://github.com/sbt/sbt-release
+addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.13")
 
 // sbt plugin for Scala Code Coverage: https://github.com/scoverage/sbt-scoverage
 addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.6.1")
