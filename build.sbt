@@ -36,48 +36,35 @@ scalacOptions ++= Seq(
   "UTF-8"
 )
 
-val relProcessForBump = Seq[ReleaseStep](
-  inquireVersions,
-  setReleaseVersion,
-  commitReleaseVersion,
-  tagRelease
-)
+//val relProcessForCommit = Seq[ReleaseStep](
+//  inquireVersions,
+//  setNextVersion,
+//  commitReleaseVersion
+//)
 
-commands += Command.command("bumpPatch") { state =>
-  val extracted = Project extract state
-  val customState = extracted.appendWithoutSession(
-    Seq(
-      releaseProcess := relProcessForBump,
-      releaseVersionBump := sbtrelease.Version.Bump.Bugfix
-    ),
-    state
+def bump(bump: sbtrelease.Version.Bump)(state: State): State = {
+  Command.process(
+    "release with-defaults",
+    Project
+      .extract(state)
+      .appendWithoutSession(
+        Seq(
+          releaseProcess := Seq[ReleaseStep](
+            inquireVersions,
+            setReleaseVersion,
+            commitReleaseVersion,
+            tagRelease
+          ),
+          releaseVersionBump := bump
+        ),
+        state
+      )
   )
-  Command.process("release with-defaults", customState)
 }
 
-commands += Command.command("bumpMinor") { state =>
-  val extracted = Project extract state
-  val customState = extracted.appendWithoutSession(
-    Seq(
-      releaseProcess := relProcessForBump,
-      releaseVersionBump := sbtrelease.Version.Bump.Minor
-    ),
-    state
-  )
-  Command.process("release with-defaults", customState)
-}
-
-commands += Command.command("bumpMajor") { state =>
-  val extracted = Project extract state
-  val customState = extracted.appendWithoutSession(
-    Seq(
-      releaseProcess := relProcessForBump,
-      releaseVersionBump := sbtrelease.Version.Bump.Major
-    ),
-    state
-  )
-  Command.process("release with-defaults", customState)
-}
+commands += Command.command("bumpPatch")(bump(sbtrelease.Version.Bump.Bugfix))
+commands += Command.command("bumpMinor")(bump(sbtrelease.Version.Bump.Minor))
+commands += Command.command("bumpMajor")(bump(sbtrelease.Version.Bump.Major))
 
 lazy val showVersion = taskKey[Unit]("Show version")
 showVersion := {
