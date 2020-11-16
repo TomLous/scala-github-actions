@@ -57,14 +57,14 @@ val releaseProcessSnapshotBump: Seq[ReleaseStep] = Seq(
 )
 
 def nextVersion(bump: sbtrelease.Version.Bump, state: State)(version: String): String = {
+  val shortHash = vcs(state).currentHash.substring(0, 7)
   sbtrelease
     .Version(version)
     .map(
       _.bump(bump)
-        .copy(qualifier = Some(s"-${vcs(state).currentHash}-SNAPSHOT"))
+        .copy(qualifier = Some(s"-$shortHash-SNAPSHOT"))
         .string
     )
-    .map(x => { println(x); x })
     .getOrElse(sbtrelease.versionFormatError(version))
 }
 
