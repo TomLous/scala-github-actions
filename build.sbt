@@ -51,7 +51,8 @@ val releaseProcessBumpAndTag: Seq[ReleaseStep] = Seq(
 
 val releaseProcessSnapshotBump: Seq[ReleaseStep] = Seq(
   inquireVersions,
-  setNextVersion
+  setNextVersion,
+  commitNextVersion
 )
 
 def bump(bump: sbtrelease.Version.Bump, steps: Seq[ReleaseStep])(state: State): State = {
@@ -61,12 +62,7 @@ def bump(bump: sbtrelease.Version.Bump, steps: Seq[ReleaseStep])(state: State): 
       .extract(state)
       .appendWithoutSession(
         Seq(
-          releaseProcess := Seq[ReleaseStep](
-            inquireVersions,
-            setReleaseVersion,
-            commitReleaseVersion,
-            tagRelease
-          ),
+          releaseProcess := steps,
           releaseVersionBump := bump
         ),
         state
