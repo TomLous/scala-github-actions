@@ -1,4 +1,5 @@
 import ReleaseTransformations._
+import sbtrelease.Utilities._
 
 name := "scala-github-actions"
 
@@ -55,7 +56,21 @@ val releaseProcessSnapshotBump: Seq[ReleaseStep] = Seq(
   commitNextVersion
 )
 
-def bump(bump: sbtrelease.Version.Bump, steps: Seq[ReleaseStep])(state: State): State = {
+releaseNextVersion := { ver =>
+  sbtrelease
+    .Version(ver)
+    .map(
+      _.bump(releaseVersionBump.value)
+        .copy(qualifier = Some("fff"))
+        .asSnapshot
+        .string
+    )
+    .getOrElse(sbtrelease.versionFormatError(ver))
+}
+
+def bump(bump: sbtrelease.Version.Bump, steps: Seq[ReleaseStep])(
+    state: State
+): State = {
   Command.process(
     "release with-defaults",
     Project
@@ -69,6 +84,14 @@ def bump(bump: sbtrelease.Version.Bump, steps: Seq[ReleaseStep])(state: State): 
       )
   )
 }
+
+def vcs(state: State): sbtrelease.Vcs =
+  Project
+    .extract(state)
+    .get(releaseVcs)
+    .getOrElse(
+      sys.error("Aborting release. Working directory is not a repository of a recognized VCS.")
+    )
 
 commands += Command.command("bumpPatch")(
   bump(sbtrelease.Version.Bump.Bugfix, releaseProcessBumpAndTag)
