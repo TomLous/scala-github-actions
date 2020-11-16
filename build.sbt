@@ -61,7 +61,7 @@ def nextVersion(bump: sbtrelease.Version.Bump, state: State)(version: String): S
     .Version(version)
     .map(
       _.bump(bump)
-        .copy(qualifier = Some("-fff-SNAPSHOT"))
+        .copy(qualifier = Some(s"-${vcs(state).currentHash}-SNAPSHOT"))
         .string
     )
     .map(x => { println(x); x })
