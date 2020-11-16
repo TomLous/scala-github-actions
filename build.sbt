@@ -56,18 +56,6 @@ val releaseProcessSnapshotBump: Seq[ReleaseStep] = Seq(
   commitNextVersion
 )
 
-releaseNextVersion := { ver =>
-  sbtrelease
-    .Version(ver)
-    .map(
-      _.bump(releaseVersionBump.value)
-        .copy(qualifier = Some("fff"))
-        .asSnapshot
-        .string
-    )
-    .getOrElse(sbtrelease.versionFormatError(ver))
-}
-
 def bump(bump: sbtrelease.Version.Bump, steps: Seq[ReleaseStep])(
     state: State
 ): State = {
@@ -77,6 +65,17 @@ def bump(bump: sbtrelease.Version.Bump, steps: Seq[ReleaseStep])(
       .extract(state)
       .appendWithoutSession(
         Seq(
+          releaseNextVersion := { ver =>
+            sbtrelease
+              .Version(ver)
+              .map(
+                _.bump(releaseVersionBump.value)
+                  .copy(qualifier = Some("fff"))
+                  .asSnapshot
+                  .string
+              )
+              .getOrElse(sbtrelease.versionFormatError(ver))
+          },
           releaseProcess := steps,
           releaseVersionBump := bump
         ),
