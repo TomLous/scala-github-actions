@@ -72,7 +72,8 @@ def bump(bump: sbtrelease.Version.Bump, steps: Seq[ReleaseStep])(
               .Version(ver)
               .map(
                 _.bump(releaseVersionBump.value)
-                  .copy(qualifier = Some("fff"))
+                  .copy(qualifier = Some("-fff-"))
+                  .asSnapshot
                   .string
               )
               .map(x => { println(x); x })
