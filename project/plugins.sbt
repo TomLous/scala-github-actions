@@ -1,6 +1,3 @@
-// Dynamic versioning: https://github.com/dwijnand/sbt-dynver
-addSbtPlugin("com.dwijnand" % "sbt-dynver" % "4.1.1")
-
 // Automated release process https://github.com/sbt/sbt-release
 addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.13")
 

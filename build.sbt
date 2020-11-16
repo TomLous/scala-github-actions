@@ -22,8 +22,6 @@ pomIncludeRepository := { _ =>
   false
 }
 
-//dynverSeparator in ThisBuild := "-"
-
 scalacOptions ++= Seq(
   "-deprecation",
   "-unchecked",
@@ -37,11 +35,7 @@ scalacOptions ++= Seq(
   "UTF-8"
 )
 
-//val relProcessForCommit = Seq[ReleaseStep](
-//  inquireVersions,
-//  setNextVersion,
-//  commitReleaseVersion
-//)
+val nextReleaseBump = sbtrelease.Version.Bump.Minor
 
 val releaseProcessBumpAndTag: Seq[ReleaseStep] = Seq(
   inquireVersions,
@@ -56,7 +50,7 @@ val releaseProcessSnapshotBump: Seq[ReleaseStep] = Seq(
   commitNextVersion
 )
 
-def nextVersion(bump: sbtrelease.Version.Bump, state: State)(version: String): String = {
+def nextSnapshotVersion(bump: sbtrelease.Version.Bump, state: State)(version: String): String = {
   val shortHash = vcs(state).currentHash.substring(0, 7)
   sbtrelease
     .Version(version)
@@ -79,7 +73,7 @@ def bump(bump: sbtrelease.Version.Bump, steps: Seq[ReleaseStep])(
         Seq(
           releaseVersionBump := bump,
           releaseProcess := steps,
-          releaseNextVersion := nextVersion(releaseVersionBump.value, state)
+          releaseNextVersion := nextSnapshotVersion(releaseVersionBump.value, state)
         ),
         state
       )
@@ -103,8 +97,11 @@ commands += Command.command("bumpMinor")(
 commands += Command.command("bumpMajor")(
   bump(sbtrelease.Version.Bump.Major, releaseProcessBumpAndTag)
 )
+commands += Command.command("bumpRelease")(
+  bump(nextReleaseBump, releaseProcessBumpAndTag)
+)
 commands += Command.command("bumpSnapshot")(
-  bump(sbtrelease.Version.Bump.Minor, releaseProcessSnapshotBump)
+  bump(nextReleaseBump, releaseProcessSnapshotBump)
 )
 
 lazy val showVersion = taskKey[Unit]("Show version")

@@ -15,6 +15,19 @@ package:
 version:
 	@sbt --error 'set showSuccess := false' showVersion
 
+set-github-config:
+	git config --global user.name "$(GITHUB_ACTOR)"
+	git config --global user.email "$(GITHUB_ACTOR)@users.noreply.github.com"
+
+bump-snapshot:
+	sbt bumpSnapshot
+
+git-push:
+	git push
+	git push --tags
+
+bump-snapshot-and-push: set-github-config bump-snapshot git-push version
+
 deploy-to-dev-dummy:
 	@echo "DEV DEPLOY"
 

@@ -87,6 +87,10 @@ jobs:
             ~/.ivy2/cache
           key: ${{ runner.os }}-sbt-cache-v2-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('project/build.properties') }}
 
+      - name: Bump Snapshot
+        uses: bash
+        run: make bump-snapshot-and-push
+
       - name: Package
         shell: bash
         run: make package
