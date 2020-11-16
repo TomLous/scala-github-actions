@@ -42,7 +42,20 @@ scalacOptions ++= Seq(
 //  commitReleaseVersion
 //)
 
-def bump(bump: sbtrelease.Version.Bump)(state: State): State = {
+val releaseProcessBumpAndTag: Seq[ReleaseStep] = Seq(
+  inquireVersions,
+  setReleaseVersion,
+  commitReleaseVersion,
+  tagRelease
+)
+
+val releaseProcessSnapshotBump: Seq[ReleaseStep] = Seq(
+  inquireVersions,
+  setNextVersion,
+  commitReleaseVersion
+)
+
+def bump(bump: sbtrelease.Version.Bump, steps: Seq[ReleaseStep])(state: State): State = {
   Command.process(
     "release with-defaults",
     Project
@@ -62,9 +75,18 @@ def bump(bump: sbtrelease.Version.Bump)(state: State): State = {
   )
 }
 
-commands += Command.command("bumpPatch")(bump(sbtrelease.Version.Bump.Bugfix))
-commands += Command.command("bumpMinor")(bump(sbtrelease.Version.Bump.Minor))
-commands += Command.command("bumpMajor")(bump(sbtrelease.Version.Bump.Major))
+commands += Command.command("bumpPatch")(
+  bump(sbtrelease.Version.Bump.Bugfix, releaseProcessBumpAndTag)
+)
+commands += Command.command("bumpMinor")(
+  bump(sbtrelease.Version.Bump.Minor, releaseProcessBumpAndTag)
+)
+commands += Command.command("bumpMajor")(
+  bump(sbtrelease.Version.Bump.Major, releaseProcessBumpAndTag)
+)
+commands += Command.command("bumpSnapshot")(
+  bump(sbtrelease.Version.Bump.Minor, releaseProcessSnapshotBump)
+)
 
 lazy val showVersion = taskKey[Unit]("Show version")
 showVersion := {
