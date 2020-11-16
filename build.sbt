@@ -56,6 +56,18 @@ val releaseProcessSnapshotBump: Seq[ReleaseStep] = Seq(
   commitNextVersion
 )
 
+def nextVersion(bump: sbtrelease.Version.Bump, state: State)(version: String): String = {
+  sbtrelease
+    .Version(version)
+    .map(
+      _.bump(bump)
+        .copy(qualifier = Some("-fff-SNAPSHOT"))
+        .string
+    )
+    .map(x => { println(x); x })
+    .getOrElse(sbtrelease.versionFormatError(version))
+}
+
 def bump(bump: sbtrelease.Version.Bump, steps: Seq[ReleaseStep])(
     state: State
 ): State = {
@@ -67,17 +79,7 @@ def bump(bump: sbtrelease.Version.Bump, steps: Seq[ReleaseStep])(
         Seq(
           releaseVersionBump := bump,
           releaseProcess := steps,
-          releaseNextVersion := { ver =>
-            sbtrelease
-              .Version(ver)
-              .map(
-                _.bump(releaseVersionBump.value)
-                  .copy(qualifier = Some("-fff-SNAPSHOT"))
-                  .string
-              )
-              .map(x => { println(x); x })
-              .getOrElse(sbtrelease.versionFormatError(ver))
-          }
+          releaseNextVersion := nextVersion(releaseVersionBump.value, state)
         ),
         state
       )
