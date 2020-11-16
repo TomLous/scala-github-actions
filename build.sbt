@@ -65,19 +65,19 @@ def bump(bump: sbtrelease.Version.Bump, steps: Seq[ReleaseStep])(
       .extract(state)
       .appendWithoutSession(
         Seq(
+          releaseVersionBump := bump,
+          releaseProcess := steps,
           releaseNextVersion := { ver =>
             sbtrelease
               .Version(ver)
               .map(
                 _.bump(releaseVersionBump.value)
                   .copy(qualifier = Some("fff"))
-                  .asSnapshot
                   .string
               )
+              .map(x => { println(x); x })
               .getOrElse(sbtrelease.versionFormatError(ver))
-          },
-          releaseProcess := steps,
-          releaseVersionBump := bump
+          }
         ),
         state
       )
