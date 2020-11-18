@@ -96,7 +96,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ github.repository.name }}-${{ steps.vars.outputs.version }}.jar
+          name: ${{ github.event.repository.name }}-${{ steps.vars.outputs.version }}.jar
           path: output/assembly.jar
 
       - name: Deploy to Dev
@@ -114,7 +114,7 @@ jobs:
           status: ${{ job.status }}
           title: Build Succeeded
           fields:
-          text: ':rocket: ${{ github.repository.name }} v${{ steps.vars.outputs.version }} deployed to DEV\n<https://github.com/${{ GITHUB_REPOSITORY }}/actions?query=workflow%3Arelease|Start Release>'
+          text: ':rocket: ${{ github.event.repository.name }} v${{ steps.vars.outputs.version }} deployed to DEV\n<https://github.com/${{ github.repository }}/actions?query=workflow%3Arelease|Start Release>'
 
 
       - name: Slack Status on Error
