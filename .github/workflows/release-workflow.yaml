@@ -45,6 +45,7 @@ jobs:
         id: pr
         uses: repo-sync/pull-request@v2
         with:
+          source_branch: release
           destination_branch: master
           pr_title: "Release ${{ steps.vars.outputs.version }} to PROD"
           pr_body: ":crown: *An automated PR*\nWhen merged ${{ github.event.repository.name }} will be released to PROD"
@@ -79,7 +80,7 @@ jobs:
           status: ${{ job.status }}
           title: CI Build Succeeded
           fields:
-          text: ':rocket: ${{ github.event.repository.name }} v${{ steps.vars.outputs.version }} deployed to STAGING\n<${{ steps.pr.outputs.pr_url}}|Release To PROD>'
+          text: ":rocket: ${{ github.event.repository.name }} v${{ steps.vars.outputs.version }} deployed to STAGING\n<${{ steps.pr.outputs.pr_url}}|Release To PROD>"
 
       - name: Slack Status on Error
         uses: 8398a7/action-slack@v3

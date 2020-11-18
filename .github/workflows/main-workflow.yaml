@@ -116,7 +116,7 @@ jobs:
           status: ${{ job.status }}
           title: CI Build Succeeded
           fields:
-          text: ':rocket: ${{ github.event.repository.name }} v${{ steps.vars.outputs.version }} deployed to DEV\n<https://github.com/${{ github.repository }}/actions?query=workflow%3Arelease|Start Release>'
+          text: ":rocket: ${{ github.event.repository.name }} v${{ steps.vars.outputs.version }} deployed to DEV\n<https://github.com/${{ github.repository }}/actions?query=workflow%3Arelease|Start Release Workflow>"
 
 
       - name: Slack Status on Error
