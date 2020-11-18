@@ -69,17 +69,17 @@ jobs:
         run: make deploy-to-staging
 
       - name: Deploy notification
-          uses: 8398a7/action-slack@v3
-          env:
-            SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          with:
-            username: 'github actions'
-            author_name: ''
-            icon_emoji: ':github:'
-            status: ${{ job.status }}
-            title: Build Succeeded
-            fields:
-            text: ':rocket: ${{ github.event.repository.name }} v${{ steps.vars.outputs.version }} deployed to STAGING\n<${{ steps.pr.outputs.pr_url}}|Release To PROD>'
+        uses: 8398a7/action-slack@v3
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        with:
+          username: 'github actions'
+          author_name: ''
+          icon_emoji: ':github:'
+          status: ${{ job.status }}
+          title: CI Build Succeeded
+          fields:
+          text: ':rocket: ${{ github.event.repository.name }} v${{ steps.vars.outputs.version }} deployed to STAGING\n<${{ steps.pr.outputs.pr_url}}|Release To PROD>'
 
       - name: Slack Status on Error
         uses: 8398a7/action-slack@v3
@@ -89,6 +89,8 @@ jobs:
           username: 'github actions'
           author_name: ''
           icon_emoji: ':github:'
+          title: CI Build Failed
+          text: ':x: The workflow  ${{ github.workflow }} triggered by ${{ github.event_name }} failed'
           status: ${{ job.status }}
           fields: repo,message,commit,action
         if: ${{ failure() }}

@@ -13,7 +13,7 @@ package:
 	@echo "output/assembly.jar"
 
 version:
-	cat version.sbt | awk '{print $5}' | tr -d '"'
+	@sbt --error 'set showSuccess := false' showVersion
 
 set-github-config:
 	git config --global user.name "$(GITHUB_ACTOR)"
