@@ -41,6 +41,19 @@ jobs:
         id: vars
         run: echo ::set-output name=version::$(make version)
 
+      - name: Create PR
+        id: pr
+        uses: repo-sync/pull-request@v2
+        with:
+          destination_branch: master
+          pr_title: "Release ${{ steps.vars.outputs.version }} to PRDO"
+          pr_body: ":crown: *An automated PR*\nWhen merged ${{ github.repository.name }} will be released to PROD"
+          pr_reviewer: "TomLous"
+          pr_assignee: "TomLous"
+          pr_label: "auto-pr,release"
+          pr_allow_empty: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Package
         shell: bash
         run: make package
@@ -48,7 +61,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: scala-github-actions-${{ steps.vars.outputs.version }}.jar
+          name: ${{ github.repository.name }}-${{ steps.vars.outputs.version }}.jar
           path: output/assembly.jar
 
       - name: Deploy to Staging
@@ -56,30 +69,17 @@ jobs:
         run: make deploy-to-staging
 
       - name: Deploy notification
-        uses: 8398a7/action-slack@v3
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        with:
-          username: 'github actions'
-          author_name: ''
-          icon_emoji: ':github:'
-          status: ${{ job.status }}
-          fields:
-          text: ':rocket: v${{ steps.vars.outputs.version }} deployed to STAGING'
-          custom_payload: |
-            {
-              attachments: [{
-                actions: [{
-                  {
-                    "name": "game",
-                    "url": "https://github.com/TomLous/scala-github-actions",
-                    "text": "Release to Prod",
-                    "type": "button",
-                    "style": "primary"
-                  }
-                }]
-              }]
-            }
+          uses: 8398a7/action-slack@v3
+          env:
+            SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          with:
+            username: 'github actions'
+            author_name: ''
+            icon_emoji: ':github:'
+            status: ${{ job.status }}
+            title: Build Succeeded
+            fields:
+            text: ':rocket: ${{ github.repository.name }} v${{ steps.vars.outputs.version }} deployed to STAGING\n<${{ steps.pr.outputs.pr_url}}|Release To PROD>'
 
       - name: Slack Status on Error
         uses: 8398a7/action-slack@v3

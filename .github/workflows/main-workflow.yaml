@@ -96,7 +96,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: scala-github-actions-${{ steps.vars.outputs.version }}.jar
+          name: ${{ github.repository.name }}-${{ steps.vars.outputs.version }}.jar
           path: output/assembly.jar
 
       - name: Deploy to Dev
@@ -112,22 +112,10 @@ jobs:
           author_name: ''
           icon_emoji: ':github:'
           status: ${{ job.status }}
+          title: Build Succeeded
           fields:
-          text: ':rocket: v${{ steps.vars.outputs.version }} deployed to DEV'
-          custom_payload: |
-            {
-              attachments: [{
-                actions: [{
-                  {
-                      "name": "game",
-                      "url": "https://github.com/TomLous/scala-github-actions/actions?query=workflow%3Arelease",
-                      "text": "Start Release",
-                      "type": "button",
-                      "style": "primary"
-                  }
-                }]
-              }]
-            }
+          text: ':rocket: ${{ github.repository.name }} v${{ steps.vars.outputs.version }} deployed to DEV\n<https://github.com/${{ GITHUB_REPOSITORY }}/actions?query=workflow%3Arelease|Start Release>'
+
 
       - name: Slack Status on Error
         uses: 8398a7/action-slack@v3

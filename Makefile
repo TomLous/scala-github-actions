@@ -13,7 +13,7 @@ package:
 	@echo "output/assembly.jar"
 
 version:
-	@sbt --error 'set showSuccess := false' showVersion
+	cat version.sbt | awk '{print $5}' | tr -d '"'
 
 set-github-config:
 	git config --global user.name "$(GITHUB_ACTOR)"
@@ -35,4 +35,8 @@ bump-release-and-push: set-github-config bump-release git-push version
 deploy-to-dev-dummy:
 	@echo "DEV DEPLOY"
 
+deploy-to-staging-dummy:
+	@echo "STAGING DEPLOY"
+
 deploy-to-dev: deploy-to-dev-dummy version
+deploy-to-staging: deploy-to-staging-dummy version
