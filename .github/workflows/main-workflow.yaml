@@ -53,7 +53,6 @@ jobs:
           username: 'github actions'
           author_name: ''
           icon_emoji: ':github:'
-          title: CI Build Failed
           text: ':x: The workflow  ${{ github.workflow }} triggered by ${{ github.event_name }} failed'
           status: ${{ job.status }}
           fields: repo,message,commit,action
@@ -114,7 +113,6 @@ jobs:
           author_name: ''
           icon_emoji: ':github:'
           status: ${{ job.status }}
-          title: CI Build Succeeded
           fields:
           text: ":rocket: ${{ github.event.repository.name }} v${{ steps.vars.outputs.version }} deployed to DEV\n<https://github.com/${{ github.repository }}/actions?query=workflow%3Arelease|Start Release Workflow>"
 
@@ -127,7 +125,6 @@ jobs:
           username: 'github actions'
           author_name: ''
           icon_emoji: ':github:'
-          title: CI Build Failed
           text: ':x: The workflow  ${{ github.workflow }} triggered by ${{ github.event_name }} failed'
           status: ${{ job.status }}
           fields: repo,message,commit,action

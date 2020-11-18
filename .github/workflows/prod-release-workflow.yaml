@@ -1,0 +1,20 @@
+name: prod-deploy
+
+on:
+  pull_request:
+    types: [closed]
+
+
+jobs:
+  release-prod:
+    name: Release to Prod
+    runs-on: ubuntu-latest
+
+    if: contains(github.event.pull_request.labels.*.name, 'release') && github.event.pull_request.merged == true
+
+    steps:
+      - name: DEBUG
+        shell: bash
+        run: |
+          echo ${{ github.event.pull_request}}
+          echo ${{ github.event.pull_request.head.ref}}

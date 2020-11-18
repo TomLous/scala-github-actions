@@ -5,6 +5,7 @@ on:
 
 jobs:
   release-deploy:
+    name: Build Release & Deploy to Staging
     runs-on: ubuntu-latest
 
     if: github.ref == 'refs/heads/master'
@@ -48,8 +49,8 @@ jobs:
           source_branch: release
           destination_branch: master
           pr_title: "Release ${{ steps.vars.outputs.version }} to PROD"
-          pr_body: ":crown: *An automated PR*\nWhen merged ${{ github.event.repository.name }} will be released to PROD"
-          pr_reviewer: "${{ github.repository_owner	}}"
+          pr_body: ":crown: *An automated PR*\nWhen merged ${{ github.event.repository.name }} ${{ steps.vars.outputs.version }} will be released to PROD"
+          pr_reviewer: "${{ github.repository_owner	}},${{ github.actor	}}"
           pr_assignee: "${{ github.repository_owner	}}"
           pr_label: "auto-pr,release"
           pr_allow_empty: true
