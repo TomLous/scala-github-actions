@@ -2,11 +2,6 @@ name: release
 
 on:
   workflow_dispatch:
-    inputs:
-      bump_type:
-        description: 'major or minor?'
-        required: true
-        default: 'minor'
 
 jobs:
   release-deploy:
@@ -38,9 +33,64 @@ jobs:
       - name: Setup Java and Scala
         uses: olafurpg/setup-scala@v10
 
-      - name: Github config
-        run: |
-          git config --global user.name "$GITHUB_ACTOR"
-          git config --global user.email "$GITHUB_ACTOR@users.noreply.github.com"
+      - name: Bump Release
+        shell: bash
+        run: make bump-release-and-push
+
+      - name: Set variables
+        id: vars
+        run: echo ::set-output name=version::$(make version)
+
+      - name: Package
+        shell: bash
+        run: make package
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: scala-github-actions-${{ steps.vars.outputs.version }}.jar
+          path: output/assembly.jar
+
+      - name: Deploy to Staging
+        shell: bash
+        run: make deploy-to-staging
+
+      - name: Deploy notification
+        uses: 8398a7/action-slack@v3
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        with:
+          username: 'github actions'
+          author_name: ''
+          icon_emoji: ':github:'
+          status: ${{ job.status }}
+          fields:
+          text: ':rocket: v${{ steps.vars.outputs.version }} deployed to STAGING'
+          custom_payload: |
+            {
+              attachments: [{
+                actions: [{
+                  {
+                    "name": "game",
+                    "url": "https://github.com/TomLous/scala-github-actions",
+                    "text": "Release to Prod",
+                    "type": "button",
+                    "style": "primary"
+                  }
+                }]
+              }]
+            }
+
+      - name: Slack Status on Error
+        uses: 8398a7/action-slack@v3
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        with:
+          username: 'github actions'
+          author_name: ''
+          icon_emoji: ':github:'
+          status: ${{ job.status }}
+          fields: repo,message,commit,action
+        if: ${{ failure() }}
 
 

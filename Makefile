@@ -22,11 +22,15 @@ set-github-config:
 bump-snapshot:
 	sbt bumpSnapshot
 
+bump-release:
+	sbt bumpRelease
+
 git-push:
 	git push
 	git push --tags
 
 bump-snapshot-and-push: set-github-config bump-snapshot git-push version
+bump-release-and-push: set-github-config bump-release git-push version
 
 deploy-to-dev-dummy:
 	@echo "DEV DEPLOY"

@@ -13,8 +13,6 @@ jobs:
   build:
     name: Build & Test
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.vars.outputs.version }}
 
     steps:
       - name: Check out repository code
@@ -47,10 +45,6 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: target
 
-      - name: Set variables
-        id: vars
-        run: echo ::set-output name=version::$(make version)
-
       - name: Slack Status on Error
         uses: 8398a7/action-slack@v3
         env:
@@ -65,9 +59,9 @@ jobs:
 
 
   deploy:
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')
     needs: build
-    name: Deploy to Dev
+    name: Deploy
     runs-on: ubuntu-latest
 
     steps:
@@ -91,9 +85,19 @@ jobs:
         shell: bash
         run: make bump-snapshot-and-push
 
+      - name: Set variables
+        id: vars
+        run: echo ::set-output name=version::$(make version)
+
       - name: Package
         shell: bash
         run: make package
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: scala-github-actions-${{ steps.vars.outputs.version }}.jar
+          path: output/assembly.jar
 
       - name: Deploy to Dev
         shell: bash
@@ -109,7 +113,21 @@ jobs:
           icon_emoji: ':github:'
           status: ${{ job.status }}
           fields:
-          text: ':rocket: v${{needs.build.outputs.version}} deployed to DEV'
+          text: ':rocket: v${{ steps.vars.outputs.version }} deployed to DEV'
+          custom_payload: |
+            {
+              attachments: [{
+                actions: [{
+                  {
+                      "name": "game",
+                      "url": "https://github.com/TomLous/scala-github-actions/actions?query=workflow%3Arelease",
+                      "text": "Start Release",
+                      "type": "button",
+                      "style": "primary"
+                  }
+                }]
+              }]
+            }
 
       - name: Slack Status on Error
         uses: 8398a7/action-slack@v3
