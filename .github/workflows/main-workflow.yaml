@@ -11,7 +11,7 @@ on:
 
 jobs:
   check:
-    name: Check for skipping
+    name: Prebuild checks
     runs-on: ubuntu-latest
     outputs:
       changed: ${{ steps.check1.num-changes > 0 }}
@@ -22,7 +22,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Check changes.
+      - name: Check changes
         id: check1
         shell: bash
         run: echo ::set-output name=num-changes::$(make check-changes)
@@ -30,15 +30,6 @@ jobs:
       - name: Number of files changed
         shell: bash
         run: echo "${{ steps.check1.num-changes }}"
-
-      - name: Number of files changed (2)
-        shell: bash
-        run: git diff --exit-code --name-only HEAD HEAD~1
-
-      - name: Number of files changed (2)
-        shell: bash
-        run: make check-changes
-
 
   build:
     name: Build & Test

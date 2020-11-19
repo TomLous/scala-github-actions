@@ -46,4 +46,4 @@ deploy-to-staging: deploy-to-staging-dummy version
 deploy-to-prod: deploy-to-prod-dummy version
 
 check-changes:
-	@echo $$(git diff --exit-code --name-only HEAD HEAD~1 | grep -v version.sbt | wc -l | tr -d ' ')
+	@echo $$(git diff --name-only HEAD HEAD~1 | cat |  grep -v version.sbt | wc -l | tr -d ' ')
