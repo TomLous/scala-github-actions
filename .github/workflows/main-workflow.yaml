@@ -29,7 +29,16 @@ jobs:
 
       - name: Number of files changed
         shell: bash
-        run: echo ${{ steps.check1.num-changes }}
+        run: echo "${{ steps.check1.num-changes }}"
+
+      - name: Number of files changed (2)
+        shell: bash
+        run: git diff --exit-code --name-only HEAD HEAD~1
+
+      - name: Number of files changed (2)
+        shell: bash
+        run: make check-changes
+
 
   build:
     name: Build & Test
@@ -76,7 +85,7 @@ jobs:
           username: 'github actions'
           author_name: ''
           icon_emoji: ':github:'
-          text: ":x: The workflow `${{ github.workflow }}` triggered by `${{ github.event_name }}` failed\n<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|See Log>"
+          text: ":x: The workflow `${{ github.workflow }}` triggered by `${{ github.event_name }}` failed\n\n:arrow_right:<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|See Log>"
           status: ${{ job.status }}
           fields: repo,message,commit,action
         if: ${{ failure() }}
@@ -137,7 +146,7 @@ jobs:
           icon_emoji: ':github:'
           status: ${{ job.status }}
           fields:
-          text: ":rocket: ${{ github.event.repository.name }} v${{ steps.vars.outputs.version }} deployed to DEV\n<https://github.com/${{ github.repository }}/actions?query=workflow%3Arelease|Start Release Workflow>"
+            text: ":rocket: *${{ github.event.repository.name }} v${{ steps.vars.outputs.version }}* deployed to *DEV*\n\n:arrow_right: <https://github.com/${{ github.repository }}/actions?query=workflow%3Arelease|Start Release Workflow>"
 
 
       - name: Slack Status on Error
@@ -148,7 +157,7 @@ jobs:
           username: 'github actions'
           author_name: ''
           icon_emoji: ':github:'
-          text: ":x: The workflow `${{ github.workflow }}` triggered by `${{ github.event_name }}` failed\n<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|See Log>"
+          text: ":x: The workflow `${{ github.workflow }}` triggered by `${{ github.event_name }}` failed\n\n:arrow_right: <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|See Log>"
           status: ${{ job.status }}
           fields: repo,message,commit,action
         if: ${{ failure() }}
