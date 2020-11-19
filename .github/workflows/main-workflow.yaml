@@ -19,12 +19,17 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
-      - name: Merged
+      - name: Check changes.
         id: check1
         shell: bash
         run: echo ::set-output name=num-changes::$(make check-changes)
 
+      - name: Number of files changed
+        shell: bash
+        run: echo ${{ steps.check1.num-changes }}
 
   build:
     name: Build & Test
@@ -71,7 +76,7 @@ jobs:
           username: 'github actions'
           author_name: ''
           icon_emoji: ':github:'
-          text: ":x: The workflow `${{ github.workflow }}` triggered by `${{ github.event_name }}` failed\n<https://github.com/${{ github.repository }}/runs/${{ github.run_id }}?check_suite_focus=true|See Log>"
+          text: ":x: The workflow `${{ github.workflow }}` triggered by `${{ github.event_name }}` failed\n<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|See Log>"
           status: ${{ job.status }}
           fields: repo,message,commit,action
         if: ${{ failure() }}
@@ -143,7 +148,7 @@ jobs:
           username: 'github actions'
           author_name: ''
           icon_emoji: ':github:'
-          text: ":x: The workflow `${{ github.workflow }}` triggered by `${{ github.event_name }}` failed\n<https://github.com/${{ github.repository }}/runs/${{ github.run_id }}?check_suite_focus=true|See Log>"
+          text: ":x: The workflow `${{ github.workflow }}` triggered by `${{ github.event_name }}` failed\n<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|See Log>"
           status: ${{ job.status }}
           fields: repo,message,commit,action
         if: ${{ failure() }}
