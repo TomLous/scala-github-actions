@@ -10,9 +10,27 @@ on:
       - 'master'
 
 jobs:
+  check:
+    name: Check for skipping
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.check1.num-changes > 0 }}
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+
+      - name: Merged
+        id: check1
+        shell: bash
+        run: echo ::set-output name=num-changes::$(make check-changes)
+
+
   build:
     name: Build & Test
     runs-on: ubuntu-latest
+    needs: check
+    if: needs.check.outputs.changed
 
     steps:
       - name: Check out repository code
@@ -53,7 +71,7 @@ jobs:
           username: 'github actions'
           author_name: ''
           icon_emoji: ':github:'
-          text: ':x: The workflow  ${{ github.workflow }} triggered by ${{ github.event_name }} failed'
+          text: ":x: The workflow `${{ github.workflow }}` triggered by `${{ github.event_name }}` failed\n<https://github.com/${{ github.repository }}/runs/${{ github.run_id }}?check_suite_focus=true|See Log>"
           status: ${{ job.status }}
           fields: repo,message,commit,action
         if: ${{ failure() }}
@@ -125,7 +143,7 @@ jobs:
           username: 'github actions'
           author_name: ''
           icon_emoji: ':github:'
-          text: ':x: The workflow  ${{ github.workflow }} triggered by ${{ github.event_name }} failed'
+          text: ":x: The workflow `${{ github.workflow }}` triggered by `${{ github.event_name }}` failed\n<https://github.com/${{ github.repository }}/runs/${{ github.run_id }}?check_suite_focus=true|See Log>"
           status: ${{ job.status }}
           fields: repo,message,commit,action
         if: ${{ failure() }}

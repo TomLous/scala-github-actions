@@ -38,5 +38,12 @@ deploy-to-dev-dummy:
 deploy-to-staging-dummy:
 	@echo "STAGING DEPLOY"
 
+deploy-to-prod-dummy:
+	@echo "PROD DEPLOY"
+
 deploy-to-dev: deploy-to-dev-dummy version
 deploy-to-staging: deploy-to-staging-dummy version
+deploy-to-prod: deploy-to-prod-dummy version
+
+check-changes:
+	@echo $$(git diff --exit-code --name-only HEAD HEAD~1 | grep -v version.sbt | wc -l | tr -d ' ')

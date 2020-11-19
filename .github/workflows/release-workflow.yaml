@@ -92,7 +92,7 @@ jobs:
           author_name: ''
           icon_emoji: ':github:'
           title: CI Build Failed
-          text: ':x: The workflow  ${{ github.workflow }} triggered by ${{ github.event_name }} failed'
+          text: ":x: The workflow `${{ github.workflow }}` triggered by `${{ github.event_name }}` failed\n<https://github.com/${{ github.repository }}/runs/${{ github.run_id }}?check_suite_focus=true|See Log>"
           status: ${{ job.status }}
           fields: repo,message,commit,action
         if: ${{ failure() }}
