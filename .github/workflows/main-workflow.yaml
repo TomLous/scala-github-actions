@@ -31,6 +31,10 @@ jobs:
         shell: bash
         run: echo "${{ steps.check1.num-changes }}"
 
+      - name: Number of files changed (2)
+        shell: bash
+        run: git diff --name-only HEAD HEAD~1 | cat
+
   build:
     name: Build & Test
     runs-on: ubuntu-latest
