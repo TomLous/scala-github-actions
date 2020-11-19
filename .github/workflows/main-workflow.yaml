@@ -14,7 +14,7 @@ jobs:
     name: Prebuild checks
     runs-on: ubuntu-latest
     outputs:
-      changed: ${{ steps.check1.num-changes > 0 }}
+      changed: ${{ steps.check1.num_changes > 0 }}
 
     steps:
       - name: Check out repository code
@@ -25,15 +25,28 @@ jobs:
       - name: Check changes
         id: check1
         shell: bash
-        run: echo ::set-output name=num-changes::$(make check-changes)
+        run: echo ::set-output name=num_changes::$(make check-changes)
+
+      - name: Turnstyle
+        uses: softprops/turnstyle@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Number of files changed
         shell: bash
-        run: echo "${{ steps.check1.num-changes }}"
+        run: echo "${{ steps.check1.num_changes }}"
 
       - name: Number of files changed (2)
         shell: bash
         run: git diff --name-only HEAD HEAD~1 | cat
+
+      - name: Number of files changed (3)
+        shell: bash
+        run: git diff --name-only HEAD HEAD~1 | cat |  grep -v version.sbt | wc -l | tr -d ' '
+
+      - name: Number of files changed (4)
+        shell: bash
+        run: make check-changes
 
   build:
     name: Build & Test
