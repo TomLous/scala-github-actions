@@ -36,15 +36,23 @@ jobs:
         shell: bash
         run: echo "${{ steps.check1.num_changes }}"
 
-      - name: Number of files changed (2)
+      - name: Number of files changed (1)
         shell: bash
         run: git diff --name-only HEAD HEAD~1 | cat
 
+      - name: Number of files changed (2)
+        shell: bash
+        run: git diff --name-only HEAD HEAD~1 | cat |  grep -v version.sbt
+
       - name: Number of files changed (3)
+        shell: bash
+        run: git diff --name-only HEAD HEAD~1 | cat |  grep -v version.sbt | wc -l
+
+      - name: Number of files changed (4)
         shell: bash
         run: git diff --name-only HEAD HEAD~1 | cat |  grep -v version.sbt | wc -l | tr -d ' '
 
-      - name: Number of files changed (4)
+      - name: Number of files changed (5)
         shell: bash
         run: make check-changes
 
