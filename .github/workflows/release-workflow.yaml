@@ -11,9 +11,13 @@ jobs:
     if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/hotfix'
 
     steps:
+      - name: Set release type
+        id: type
+        run: echo ::set-output name=branch::${{ github.ref != 'refs/heads/master' && 'release' || 'hotfix' }}
+
       - name: Delete current release branch
         uses: dawidd6/action-delete-branch@v3
-        if: github.ref == 'refs/heads/master'
+        if: steps.type.outputs.branch == 'release'
         continue-on-error: true
         with:
           github_token: ${{github.token}}
@@ -21,7 +25,7 @@ jobs:
 
       - name: Create new release Branch
         uses: peterjgrainger/action-create-branch@v2.0.1
-        if: github.ref == 'refs/heads/master'
+        if: steps.type.outputs.branch == 'release'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -29,28 +33,20 @@ jobs:
 
       - name: Check out repository code
         uses: actions/checkout@v2
-        if: github.ref == 'refs/heads/master'
         with:
-          ref: 'release'
-          fetch-depth: 0
-
-      - name: Check out repository code
-        uses: actions/checkout@v2
-        if: github.ref == 'refs/heads/hotfix'
-        with:
-          ref: 'hotfix'
+          ref: steps.type.outputs.branch
           fetch-depth: 0
 
       - name: Setup Java and Scala
         uses: olafurpg/setup-scala@v10
 
       - name: Bump Release
-        if: github.ref == 'refs/heads/master'
+        if: steps.type.outputs.branch == 'release'
         shell: bash
         run: make bump-release-and-push
 
       - name: Bump Hotfix
-        if: github.ref == 'refs/heads/hotfix'
+        if: steps.type.outputs.branch == 'hotfix'
         shell: bash
         run: make bump-patch-and-push
 
@@ -62,15 +58,16 @@ jobs:
         id: pr
         uses: repo-sync/pull-request@v2
         with:
-          source_branch: release
+          source_branch: steps.type.outputs.branch
           destination_branch: master
           pr_title: "Release ${{ steps.vars.outputs.version }} to PROD"
-          pr_body: ":crown: *An automated PR*\nWhen merged ${{ github.event.repository.name }} ${{ steps.vars.outputs.version }} will be released to PROD"
+          pr_body: ":crown: *An automated PR*\nWhen merged ${{ github.event.repository.name }} ${{ steps.vars.outputs.version }} ${{ steps.type.outputs.branch }} will be released to PROD"
           pr_reviewer: "${{ github.repository_owner	}},${{ github.actor	}}"
           pr_assignee: "${{ github.repository_owner	}}"
           pr_label: "auto-pr,release"
           pr_allow_empty: true
           github_token: ${{ secrets.GITHUB_TOKEN }}
+
 
       - name: Package
         shell: bash
