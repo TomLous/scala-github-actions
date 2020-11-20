@@ -50,14 +50,23 @@ val releaseProcessSnapshotBump: Seq[ReleaseStep] = Seq(
   commitNextVersion
 )
 
+def bumpedVersion(bump: sbtrelease.Version.Bump, state: State)(version: String): String = {
+  sbtrelease
+    .Version(version)
+    .map {
+      case v if version == v.withoutQualifier.string =>
+        v.bump(bump).withoutQualifier.string
+      case v => v.withoutQualifier.string
+    }
+    .getOrElse(sbtrelease.versionFormatError(version))
+}
+
 def nextSnapshotVersion(bump: sbtrelease.Version.Bump, state: State)(version: String): String = {
   val shortHash = vcs(state).currentHash.substring(0, 7)
   sbtrelease
     .Version(version)
     .map(
-      _.bump(bump)
-        .copy(qualifier = Some(s"-$shortHash-SNAPSHOT"))
-        .string
+      _.copy(qualifier = Some(s"-$shortHash-SNAPSHOT")).string
     )
     .getOrElse(sbtrelease.versionFormatError(version))
 }
@@ -73,6 +82,7 @@ def bump(bump: sbtrelease.Version.Bump, steps: Seq[ReleaseStep])(
         Seq(
           releaseVersionBump := bump,
           releaseProcess := steps,
+          releaseVersion := bumpedVersion(bump, state),
           releaseNextVersion := nextSnapshotVersion(releaseVersionBump.value, state)
         ),
         state

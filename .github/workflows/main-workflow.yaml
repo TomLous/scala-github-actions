@@ -6,7 +6,6 @@ on:
       - 'feature/**'
       - 'feat/**'
       - 'hotfix'
-      - 'hotfix/**'
       - 'master'
 
 jobs:
@@ -36,25 +35,7 @@ jobs:
         shell: bash
         run: echo "${{ steps.check1.num_changes }}"
 
-      - name: Number of files changed (1)
-        shell: bash
-        run: git diff --name-only HEAD HEAD~1 | cat
 
-      - name: Number of files changed (2)
-        shell: bash
-        run: git diff --name-only HEAD HEAD~1 | cat |  grep -v version.sbt
-
-      - name: Number of files changed (3)
-        shell: bash
-        run: git diff --name-only HEAD HEAD~1 | cat |  grep -v version.sbt | wc -l
-
-      - name: Number of files changed (4)
-        shell: bash
-        run: git diff --name-only HEAD HEAD~1 | cat |  grep -v version.sbt | wc -l | tr -d ' '
-
-      - name: Number of files changed (5)
-        shell: bash
-        run: make check-changes
 
   build:
     name: Build & Test
@@ -106,6 +87,25 @@ jobs:
           fields: repo,message,commit,action
         if: ${{ failure() }}
 
+
+  notify:
+    if: github.ref == 'refs/heads/hotfix'
+    needs: build
+    name: Notify
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Hotfix notification
+        uses: 8398a7/action-slack@v3
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        with:
+          username: 'github actions'
+          author_name: ''
+          icon_emoji: ':github:'
+          status: ${{ job.status }}
+          fields:
+          text: ":eight_pointed_black_star: *${{ github.event.repository.name }} hotfix* ready for release\n\n:arrow_right: <https://github.com/${{ github.repository }}/actions?query=workflow%3Arelease|Start Release Workflow>\n\n:exclamation: Don't create own PR and/or merge with master"
 
   deploy:
     if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')
