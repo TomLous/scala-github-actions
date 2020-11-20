@@ -35,6 +35,14 @@ jobs:
         shell: bash
         run: echo "${{ steps.check1.num_changes }}"
 
+      - name: Steps
+        shell: bash
+        run: |
+          git diff --name-only HEAD HEAD~1 | cat
+          git diff --name-only HEAD HEAD~1 | cat | grep -v version.sbt || true
+          git diff --name-only HEAD HEAD~1 | cat | grep -v version.sbt || true | wc -l
+
+
 
 
   build:
