@@ -41,6 +41,8 @@ jobs:
           git diff --name-only HEAD HEAD~1 | cat
           git diff --name-only HEAD HEAD~1 | cat | grep -v version.sbt || true
           git diff --name-only HEAD HEAD~1 | cat | grep -v version.sbt || true | wc -l
+          git diff --name-only HEAD HEAD~1 | cat | grep -v version.sbt || true | wc -l | tr -d ' '
+          make check-changes
 
 
 

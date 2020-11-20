@@ -50,8 +50,9 @@ deploy-to-staging: deploy-to-staging-dummy version
 deploy-to-prod: deploy-to-prod-dummy version
 
 check-changes:
-	git diff --name-only HEAD HEAD~1 | cat |  grep -v version.sbt || true | wc -l | tr -d ' '
+	@git diff --name-only HEAD HEAD~1 | cat | grep -v version.sbt || true | wc -l | tr -d ' '
 
 create-hotfix-branch:
 	git fetch
+	git branch -d hotfix || true
 	git checkout -b hotfix $$(git describe --tags --abbrev=0 | grep -E "^v[0-9]+\.[0-9]+\.[0-9]+$$")
