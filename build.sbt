@@ -55,7 +55,7 @@ def bumpedVersion(bump: sbtrelease.Version.Bump, state: State)(version: String):
     .Version(version)
     .map {
       case v if version == v.withoutQualifier.string =>
-        println(v.string); println(v.withoutQualifier.string); v.bump(bump).withoutQualifier.string
+        v.bump(bump).withoutQualifier.string
       case v => v.withoutQualifier.string
     }
     .getOrElse(sbtrelease.versionFormatError(version))
