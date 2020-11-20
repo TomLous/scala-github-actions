@@ -11,19 +11,13 @@ jobs:
     runs-on: ubuntu-latest
 
     # If merged & pr was tagged release & from a release branch
-    if: contains(github.event.pull_request.labels.*.name, 'release') && github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'release'
+    if: contains(github.event.pull_request.labels.*.name, 'release') && github.event.pull_request.merged == true && (github.event.pull_request.head.ref == 'release' || github.event.pull_request.head.ref == 'hotfix')
 
     steps:
-      - name: Delete current release branch
-        uses: dawidd6/action-delete-branch@v3
-        continue-on-error: true
-        with:
-          github_token: ${{github.token}}
-          branches: release
-
       - name: Check out repository code
         uses: actions/checkout@v2
         with:
+          ref: github.event.pull_request.head.ref
           fetch-depth: 0
 
       - name: Setup Java and Scala
@@ -89,6 +83,12 @@ jobs:
           fields:
           text: ":rocket: *${{ github.event.repository.name }} v${{ steps.vars.outputs.version }}* deployed to *PROD*\n\n:arrow_right: <https://github.com/${{ github.repository }}/releases/tag/v${{ steps.vars.outputs.version }}|Check Release>"
 
+      - name: Delete current release/hotfix branch
+        uses: dawidd6/action-delete-branch@v3
+        continue-on-error: true
+        with:
+          github_token: ${{github.token}}
+          branches: github.event.pull_request.head.ref
 
       - name: Slack Status on Error
         uses: 8398a7/action-slack@v3
