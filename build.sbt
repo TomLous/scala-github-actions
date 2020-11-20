@@ -66,9 +66,7 @@ def nextSnapshotVersion(bump: sbtrelease.Version.Bump, state: State)(version: St
   sbtrelease
     .Version(version)
     .map(
-      _.bump(bump)
-        .copy(qualifier = Some(s"-$shortHash-SNAPSHOT"))
-        .string
+      _.copy(qualifier = Some(s"-$shortHash-SNAPSHOT")).string
     )
     .getOrElse(sbtrelease.versionFormatError(version))
 }
