@@ -1,11 +1,11 @@
-name: release
+name: Manually triggered release workflow
 
 on:
   workflow_dispatch:
 
 jobs:
   release-deploy:
-    name: Build Release & Deploy to Staging
+    name:  Build & Deploy to Staging
     runs-on: ubuntu-latest
 
     if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/hotfix'
@@ -62,6 +62,21 @@ jobs:
         id: vars
         run: echo ::set-output name=version::$(make version)
 
+      - name: Find Old Pull Request
+        uses: juliangruber/find-pull-request-action@v1
+        id: find-pull-request
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ steps.type.outputs.branch }}
+
+      - name: Close Old Pull Request
+        if: ${{ steps.find-pull-request.outputs.number > 0 }}
+        uses: peter-evans/close-pull@v1
+        with:
+          pull-request-number: ${{ steps.find-pull-request.outputs.number }}
+          comment: Auto-closing pull request
+          delete-branch: false
+
       - name: Create PR
         id: pr
         uses: repo-sync/pull-request@v2
@@ -69,13 +84,12 @@ jobs:
           source_branch: ${{ steps.type.outputs.branch }}
           destination_branch: master
           pr_title: "Release ${{ steps.vars.outputs.version }} to PROD"
-          pr_body: ":crown: *An automated PR*\nWhen merged ${{ github.event.repository.name }} ${{ steps.vars.outputs.version }} ${{ steps.type.outputs.branch }} will be released to PROD"
+          pr_body: ":gear: *An automated PR*\nWhen merged ${{ github.event.repository.name }} ${{ steps.vars.outputs.version }} ${{ steps.type.outputs.branch }} will be released to PROD"
           pr_reviewer: "${{ github.repository_owner	}},${{ github.actor	}}"
           pr_assignee: "${{ github.repository_owner	}}"
           pr_label: "auto-pr,release"
           pr_allow_empty: true
           github_token: ${{ secrets.GITHUB_TOKEN }}
-
 
       - name: Package
         shell: bash
@@ -101,7 +115,7 @@ jobs:
           icon_emoji: ':github:'
           status: ${{ job.status }}
           fields:
-          text: ":rocket: *${{ github.event.repository.name }} v${{ steps.vars.outputs.version }}* deployed to *STAGING*\n\n:arrow_right: <${{ steps.pr.outputs.pr_url}}|Release To PROD>"
+          text: ":rocket: ${{ github.event.repository.name }} *v${{ steps.vars.outputs.version }}* deployed to *STAGING*\n\n:arrow_right: <${{ steps.pr.outputs.pr_url}}|Release To PROD>"
 
       - name: Slack Status on Error
         uses: 8398a7/action-slack@v3

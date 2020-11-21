@@ -115,7 +115,7 @@ jobs:
           icon_emoji: ':github:'
           status: ${{ job.status }}
           fields:
-          text: ":eight_pointed_black_star: *${{ github.event.repository.name }} hotfix* ready for release\n\n:arrow_right: <https://github.com/${{ github.repository }}/actions?query=workflow%3Arelease|Start Release Workflow>\n\n:exclamation: Don't create own PR and/or merge with master"
+          text: ":eight_pointed_black_star: ${{ github.event.repository.name }} *hotfix* ready for release\n\n:arrow_right: <https://github.com/${{ github.repository }}/actions?query=workflow%3Arelease|Start Release Workflow>\n\n:exclamation: Choose the hotfix branch\n:exclamation: Don't create own PR and/or merge with master"
 
   deploy:
     if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')
@@ -172,7 +172,7 @@ jobs:
           icon_emoji: ':github:'
           status: ${{ job.status }}
           fields:
-          text: ":rocket: *${{ github.event.repository.name }} v${{ steps.vars.outputs.version }}* deployed to *DEV*\n\n:arrow_right: <https://github.com/${{ github.repository }}/actions?query=workflow%3Arelease|Start Release Workflow>"
+          text: ":rocket: ${{ github.event.repository.name }} *v${{ steps.vars.outputs.version }}* deployed to *DEV*\n\n:arrow_right: <https://github.com/${{ github.repository }}/actions?query=workflow%3Arelease|Start Release Workflow>"
 
 
       - name: Slack Status on Error
