@@ -1,4 +1,4 @@
-name: prod-deploy
+name: Deploy to PROD
 
 on:
   pull_request:
@@ -81,7 +81,7 @@ jobs:
           icon_emoji: ':github:'
           status: ${{ job.status }}
           fields:
-          text: ":rocket: *${{ github.event.repository.name }} v${{ steps.vars.outputs.version }}* deployed to *PROD*\n\n:arrow_right: <https://github.com/${{ github.repository }}/releases/tag/v${{ steps.vars.outputs.version }}|Check Release>"
+          text: ":rocket: ${{ github.event.repository.name }} *v${{ steps.vars.outputs.version }}* deployed to *PROD*\n\n:arrow_right: <https://github.com/${{ github.repository }}/releases/tag/v${{ steps.vars.outputs.version }}|Check Release>"
 
       - name: Delete current release/hotfix branch
         uses: dawidd6/action-delete-branch@v3

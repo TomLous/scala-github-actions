@@ -13,7 +13,7 @@ jobs:
     name: Prebuild checks
     runs-on: ubuntu-latest
     outputs:
-      changed: ${{ steps.check1.num_changes > 0 }}
+      changed: ${{ steps.check1.outputs.num_changes > 0 }}
 
     steps:
       - name: Check out repository code
@@ -33,14 +33,16 @@ jobs:
 
       - name: Number of files changed
         shell: bash
-        run: echo "${{ steps.check1.num_changes }}"
+        run: echo "${{ steps.check1.outputs.num_changes }}"
 
       - name: Steps
         shell: bash
         run: |
           git diff --name-only HEAD HEAD~1 | cat
-          git diff --name-only HEAD HEAD~1 | cat | grep -v version.sbt || true
-          git diff --name-only HEAD HEAD~1 | cat | grep -v version.sbt || true | wc -l
+          git diff --name-only HEAD HEAD~1 | cat | (grep -v version.sbt || true)
+          git diff --name-only HEAD HEAD~1 | cat | (grep -v version.sbt || true) | wc -l
+          git diff --name-only HEAD HEAD~1 | cat | (grep -v version.sbt || true) | wc -l | tr -d ' '
+          make check-changes
 
 
 
@@ -113,7 +115,7 @@ jobs:
           icon_emoji: ':github:'
           status: ${{ job.status }}
           fields:
-          text: ":eight_pointed_black_star: *${{ github.event.repository.name }} hotfix* ready for release\n\n:arrow_right: <https://github.com/${{ github.repository }}/actions?query=workflow%3Arelease|Start Release Workflow>\n\n:exclamation: Don't create own PR and/or merge with master"
+          text: ":eight_pointed_black_star: ${{ github.event.repository.name }} *hotfix* ready for release\n\n:arrow_right: <https://github.com/${{ github.repository }}/actions?query=workflow%3Arelease|Start Release Workflow>\n\n:exclamation: Choose the hotfix branch\n:exclamation: Don't create own PR and/or merge with master"
 
   deploy:
     if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')
@@ -170,7 +172,7 @@ jobs:
           icon_emoji: ':github:'
           status: ${{ job.status }}
           fields:
-          text: ":rocket: *${{ github.event.repository.name }} v${{ steps.vars.outputs.version }}* deployed to *DEV*\n\n:arrow_right: <https://github.com/${{ github.repository }}/actions?query=workflow%3Arelease|Start Release Workflow>"
+          text: ":rocket: ${{ github.event.repository.name }} *v${{ steps.vars.outputs.version }}* deployed to *DEV*\n\n:arrow_right: <https://github.com/${{ github.repository }}/actions?query=workflow%3Arelease|Start Release Workflow>"
 
 
       - name: Slack Status on Error
