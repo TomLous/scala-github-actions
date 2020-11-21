@@ -1,4 +1,4 @@
-name: 'Automatic: on push'
+name: 'Automatic: On Push'
 
 on:
   push:
@@ -169,7 +169,7 @@ jobs:
           icon_emoji: ':github:'
           status: ${{ job.status }}
           fields:
-          text: ":rocket: ${{ github.event.repository.name }} *v${{ steps.vars.outputs.version }}* deployed to *DEV*\n\n:arrow_right: <https://github.com/${{ github.repository }}/actions?query=workflow%3Arelease|Start Release Workflow (master)>"
+          text: ":rocket: ${{ github.event.repository.name }} *v${{ steps.vars.outputs.version }}* deployed to *DEV*\n\n:arrow_right: <https://github.com/${{ github.repository }}/actions?query=workflow%3A\"Manual%3A+Start+Release\"|Start Release Workflow (master)>"
 
       - name: Slack on error
         uses: 8398a7/action-slack@v3
