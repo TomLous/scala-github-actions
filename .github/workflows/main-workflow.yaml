@@ -26,8 +26,8 @@ jobs:
         id: check1
         shell: bash
         run: |
-          echo ::set-output name=num_changes::$(make check-changes)
-          git diff --name-only ${{ github.event.before }} ${{ github.sha }}
+          echo ::set-output name=num_changes::$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | (grep -v version.sbt || true) | wc -l | tr -d ' ')
+          git diff --name-only ${{ github.event.before }} ${{ github.sha }} | (grep -v version.sbt || true) | wc -l | tr -d ' '
 
       - name: Num changes
         shell: bash
