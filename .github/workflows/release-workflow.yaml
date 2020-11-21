@@ -1,4 +1,4 @@
-name: Manually triggered release workflow
+name: 'Manual: Start release'
 
 on:
   workflow_dispatch:
@@ -31,7 +31,7 @@ jobs:
           github_token: ${{github.token}}
           branches: release
 
-      - name: Create new release Branch
+      - name: Create new release branch
         uses: peterjgrainger/action-create-branch@v2.0.1
         if: steps.type.outputs.branch == 'release'
         env:
@@ -62,14 +62,14 @@ jobs:
         id: vars
         run: echo ::set-output name=version::$(make version)
 
-      - name: Find Old Pull Request
+      - name: Find old PR
         uses: juliangruber/find-pull-request-action@v1
         id: find-pull-request
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ steps.type.outputs.branch }}
 
-      - name: Close Old Pull Request
+      - name: Close old PR
         if: ${{ steps.find-pull-request.outputs.number > 0 }}
         uses: peter-evans/close-pull@v1
         with:
@@ -77,21 +77,21 @@ jobs:
           comment: Auto-closing pull request
           delete-branch: false
 
-      - name: Create PR
+      - name: Create new PR
         id: pr
         uses: repo-sync/pull-request@v2
         with:
           source_branch: ${{ steps.type.outputs.branch }}
           destination_branch: master
           pr_title: "Release ${{ steps.vars.outputs.version }} to PROD"
-          pr_body: ":gear: *An automated PR*\nWhen merged ${{ github.event.repository.name }} ${{ steps.vars.outputs.version }} ${{ steps.type.outputs.branch }} will be released to PROD"
+          pr_body: ":gear: *Automated PR*\nWhen merged ${{ github.event.repository.name }} ${{ steps.vars.outputs.version }} ${{ steps.type.outputs.branch }} will be released to PROD\nClose PR to cancel"
           pr_reviewer: "${{ github.repository_owner	}},${{ github.actor	}}"
           pr_assignee: "${{ github.repository_owner	}}"
           pr_label: "auto-pr,release"
           pr_allow_empty: true
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Package
+      - name: Package code
         shell: bash
         run: make package
 
@@ -101,7 +101,7 @@ jobs:
           name: ${{ github.event.repository.name }}-${{ steps.vars.outputs.version }}.jar
           path: output/assembly.jar
 
-      - name: Deploy to Staging
+      - name: Deploy to STAGING
         shell: bash
         run: make deploy-to-staging
 
@@ -117,7 +117,7 @@ jobs:
           fields:
           text: ":rocket: ${{ github.event.repository.name }} *v${{ steps.vars.outputs.version }}* deployed to *STAGING*\n\n:arrow_right: <${{ steps.pr.outputs.pr_url}}|Release To PROD>"
 
-      - name: Slack Status on Error
+      - name: Slack on error
         uses: 8398a7/action-slack@v3
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

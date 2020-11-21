@@ -1,9 +1,8 @@
-name: Deploy to PROD
+name: 'Automatic: Deploy to PROD'
 
 on:
   pull_request:
     types: [closed]
-
 
 jobs:
   release-prod:
@@ -31,7 +30,7 @@ jobs:
             ~/.ivy2/cache
           key: ${{ runner.os }}-sbt-cache-v2-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('project/build.properties') }}
 
-      - name: Package
+      - name: Package code
         shell: bash
         run: make package
 
@@ -45,7 +44,7 @@ jobs:
           name: ${{ github.event.repository.name }}-${{ steps.vars.outputs.version }}.jar
           path: output/assembly.jar
 
-      - name: Deploy to Prod
+      - name: Deploy to PROD
         shell: bash
         run: make deploy-to-prod
 
@@ -60,7 +59,7 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload Release Asset (.jar)
+      - name: Upload release asset (.jar)
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
@@ -90,7 +89,7 @@ jobs:
           github_token: ${{github.token}}
           branches: ${{ github.event.pull_request.head.ref}}
 
-      - name: Slack Status on Error
+      - name: Slack on error
         uses: 8398a7/action-slack@v3
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
