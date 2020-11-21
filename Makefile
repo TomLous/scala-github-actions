@@ -1,3 +1,4 @@
+SHELL := /bin/bash
 .DEFAULT_GOAL := test
 
 ROOT_DIR:=$(strip $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
@@ -50,7 +51,7 @@ deploy-to-staging: deploy-to-staging-dummy version
 deploy-to-prod: deploy-to-prod-dummy version
 
 check-changes:
-	@git diff --name-only HEAD HEAD~1 | cat | grep -v version.sbt || true | wc -l | tr -d ' '
+	@git diff --name-only HEAD HEAD~1 | cat | (grep -v version.sbt || true) | wc -l | tr -d ' '
 
 create-hotfix-branch:
 	git fetch
