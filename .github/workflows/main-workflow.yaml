@@ -28,10 +28,6 @@ jobs:
           echo ::set-output name=num_changes::$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | (grep -v version.sbt || true) | wc -l | tr -d ' ')
           git diff --name-only ${{ github.event.before }} ${{ github.sha }} | (grep -v version.sbt || true) | wc -l | tr -d ' '
 
-      - name: Num changes
-        shell: bash
-        run: echo "${{ steps.check1.outputs.num_changes }}"
-
       - name: Turnstyle (1 at the time)
         uses: softprops/turnstyle@v1
         env:
@@ -44,12 +40,6 @@ jobs:
     if: needs.check.outputs.num_changes > 0
 
     steps:
-      - name: Num changes
-        shell: bash
-        run: |
-          echo "${{ needs.check.outputs.changed }}"
-          echo "${{ needs.check.outputs.num_changes }}"
-
       - name: Check out repository code
         uses: actions/checkout@v2
         with:
